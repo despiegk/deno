@@ -1,15 +1,21 @@
-import { launch } from "https://deno.land/x/carol@v0.0.6/mod.ts";
-import { dirname, join } from "https://deno.land/std@0.54.0/path/mod.ts";
+import { Drash } from "https://deno.land/x/drash@v1.0.5/mod.ts";
 
-const app = await launch({
-  title: "Hello Deno!",
-  width: 480,
-  height: 320
+class HomeResource extends Drash.Http.Resource {
+  static paths = ["/"];
+  public GET() {
+    this.response.body = "Hello World! deno + Drash is cool!";
+    return this.response;
+  }
+}
+
+const server = new Drash.Http.Server({
+  response_output: "text/html",
+  resources: [HomeResource]
 });
 
-app.onExit().then(() => Deno.exit(0));
+server.run({
+  hostname: "localhost",
+  port: 1447
+});
 
-await app.exposeFunction("greet", (name: string) => `Hello, ${name}!`);
-const folder = join(dirname(new URL(import.meta.url).pathname), "public");
-app.serveFolder(folder); // Serve contents from "./public" folder
-await app.load("index.html");
+console.log("Server listening: http://localhost:1447");
